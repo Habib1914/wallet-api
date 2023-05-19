@@ -47,15 +47,26 @@ public class UsuarioControllerTest {
                 .andExpect(jsonPath("$.data.password").value(SENHA));
     }
 
+    @Test
+    public void testInvalidSave() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post(URL).content(getJsonPayload(ID, "", "SENHA", "EMAIL")).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors").isNotEmpty());
+    }
+
     public Usuario getMockUser() {
         return Usuario.builder().id(ID).name(NAME).password(SENHA).email(EMAIL).build();
     }
 
     public String getJsonPayload(Long id, String name, String senha, String email) throws JsonProcessingException {
-        UsuarioDTO dto = UsuarioDTO.builder().id(id).name(name).password(senha).email(email).build();
+        UsuarioDTO dto = new UsuarioDTO();
+        dto.setId(id);
+        dto.setName(name);
+        dto.setPassword(senha);
+        dto.setEmail(email);
 
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(dto);
     }
+
 }
 
